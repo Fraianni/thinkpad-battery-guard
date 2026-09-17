@@ -1,0 +1,6 @@
+[Unit]
+Description=Battery charge guard
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/battery-guard.sh
