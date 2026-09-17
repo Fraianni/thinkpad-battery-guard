@@ -37,6 +37,8 @@ charge_behaviour = auto
 
 Between the two thresholds, it preserves the previous charging state.
 
+**Important:** `inhibit-charge` prevents further charging but does not force discharge while AC is connected. The laptop keeps running on AC power and the battery stays at roughly its current percentage. To actually bring the percentage down, you need to unplug the charger and let the battery discharge naturally.
+
 ## Requirements
 
 Linux with systemd and a battery exposing:
@@ -96,6 +98,38 @@ sudo ./install.sh
 
 ```bash
 sudo ./uninstall.sh
+```
+
+## Optional desktop reminder
+
+Since `inhibit-charge` only stops further charging and does not discharge the battery for you, an optional reminder is included. It notifies you (via `notify-send`) when the charger is connected and the battery is at or above the configured threshold, prompting you to unplug it if you want the percentage to go down.
+
+The reminder runs as a systemd **user** service, not root, and checks state every 2 minutes. It notifies once per "charger connected" session and resets automatically when you unplug.
+
+Install:
+
+```bash
+./install-reminder.sh
+```
+
+Uninstall:
+
+```bash
+./uninstall-reminder.sh
+```
+
+**Do not use `sudo` with these scripts.** They install into `~/.local/bin` and `~/.config/systemd/user/` and are managed with `systemctl --user`.
+
+Check the reminder timer status:
+
+```bash
+systemctl --user status battery-reminder.timer
+```
+
+Configuration (edit `THRESHOLD` in `battery-reminder.sh`, then reinstall):
+
+```bash
+THRESHOLD=80
 ```
 
 ## Tested on

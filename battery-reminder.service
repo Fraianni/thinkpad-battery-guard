@@ -1,0 +1,6 @@
+[Unit]
+Description=Battery charge reminder
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/battery-reminder.sh
