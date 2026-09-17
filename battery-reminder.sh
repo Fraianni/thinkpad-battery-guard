@@ -13,7 +13,7 @@ STOP_THRESHOLD=80
 # MAX_REPEATS: 0 = no cap on repeats. N > 0 = stop re-notifying after N
 #   repeats (still resets once the condition clears). Ignored when
 #   REPEAT_EVERY_RUNS is 0.
-REPEAT_EVERY_RUNS=0
+REPEAT_EVERY_RUNS=1
 MAX_REPEATS=0
 
 BAT_CAPACITY="/sys/class/power_supply/BAT0/capacity"
