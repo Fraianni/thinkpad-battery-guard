@@ -1,10 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-THRESHOLD=80
+# Should match the thresholds configured in battery-guard.sh
+START_THRESHOLD=55
+STOP_THRESHOLD=80
 
 BAT_CAPACITY="/sys/class/power_supply/BAT0/capacity"
-STATE="$HOME/.cache/battery-reminder-state"
+STATE_HIGH="$HOME/.cache/battery-reminder-state-high"
+STATE_LOW="$HOME/.cache/battery-reminder-state-low"
 
 [ -f "$BAT_CAPACITY" ] || exit 0
 
@@ -20,12 +23,24 @@ for supply in /sys/class/power_supply/*; do
     fi
 done
 
-if [ "$AC_ONLINE" -eq 1 ] && [ "$CAP" -ge "$THRESHOLD" ]; then
-    if [ ! -f "$STATE" ]; then
+# Above the stop threshold on AC: remind to unplug so it can discharge.
+if [ "$AC_ONLINE" -eq 1 ] && [ "$CAP" -ge "$STOP_THRESHOLD" ]; then
+    if [ ! -f "$STATE_HIGH" ]; then
         notify-send "Battery Guard" "Battery is at ${CAP}%. Unplug the charger to let it discharge." || true
-        mkdir -p "$(dirname "$STATE")"
-        touch "$STATE"
+        mkdir -p "$(dirname "$STATE_HIGH")"
+        touch "$STATE_HIGH"
     fi
 else
-    rm -f "$STATE"
+    rm -f "$STATE_HIGH"
+fi
+
+# Below the start threshold on battery: remind to plug in so charging resumes.
+if [ "$AC_ONLINE" -eq 0 ] && [ "$CAP" -le "$START_THRESHOLD" ]; then
+    if [ ! -f "$STATE_LOW" ]; then
+        notify-send "Battery Guard" "Battery is at ${CAP}%. Plug in the charger to start charging." || true
+        mkdir -p "$(dirname "$STATE_LOW")"
+        touch "$STATE_LOW"
+    fi
+else
+    rm -f "$STATE_LOW"
 fi

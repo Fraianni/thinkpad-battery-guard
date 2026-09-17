@@ -1,3 +1,4 @@
 *.swp
 *~
-battery-reminder-state
+battery-reminder-state-high
+battery-reminder-state-low

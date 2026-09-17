@@ -102,9 +102,12 @@ sudo ./uninstall.sh
 
 ## Optional desktop reminder
 
-Since `inhibit-charge` only stops further charging and does not discharge the battery for you, an optional reminder is included. It notifies you (via `notify-send`) when the charger is connected and the battery is at or above the configured threshold, prompting you to unplug it if you want the percentage to go down.
+Since `inhibit-charge` only stops further charging and does not discharge the battery for you, an optional two-way reminder is included, mirroring the thresholds in `battery-guard.sh`:
 
-The reminder runs as a systemd **user** service, not root, and checks state every 2 minutes. It notifies once per "charger connected" session and resets automatically when you unplug.
+- Charger connected and battery **at or above `STOP_THRESHOLD`**: notifies to unplug the charger.
+- Charger disconnected and battery **at or below `START_THRESHOLD`**: notifies to plug the charger back in.
+
+The reminder runs as a systemd **user** service, not root, and checks state every 2 minutes. Each notification fires once per session (i.e. once while the condition holds) and resets automatically once the condition clears — either by crossing back over the threshold or by plugging/unplugging the charger.
 
 Install:
 
@@ -126,10 +129,11 @@ Check the reminder timer status:
 systemctl --user status battery-reminder.timer
 ```
 
-Configuration (edit `THRESHOLD` in `battery-reminder.sh`, then reinstall):
+Configuration (edit these values in `battery-reminder.sh`, then reinstall — keep them in sync with `battery-guard.sh` unless you want the reminder to fire at different points):
 
 ```bash
-THRESHOLD=80
+START_THRESHOLD=55
+STOP_THRESHOLD=80
 ```
 
 ## Tested on
